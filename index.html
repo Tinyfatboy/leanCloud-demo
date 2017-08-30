@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>LeanCloud Demo</title>
+    <script src='./node_modules/leancloud-storage/dist/av.js'></script>
+</head>
+<body>
+    <h1>LeanCloud测试</h1>
+    <div id='welcome'></div>
+    <button id="logout" hidden>登出</button>
+    <form name="signIn">
+        <input type="text" name="username" placeholder="用户名">
+        <input type="email" name="email" placeholder="邮箱">
+        <input type="password" name="password" placeholder="密码">
+        <input type="submit" value="注册">
+    </form>
+    <div id="signInError"></div>
+    <form name="login">
+        <input type="text" name="username" placeholder="用户名">
+        <input type="password" name="password" placeholder="密码">
+        <input type="submit" value="登录">
+    </form>
+</body>
+<script>
+    var APP_ID = 'G2hjG6oLE5YnUbbFcg0P8ibR-gzGzoHsz';
+    var APP_KEY = 'f5Wlf1Lw7PdjlTqg9bKGz3KC';
+
+    AV.init({
+        appId: APP_ID,
+        appKey: APP_KEY
+    });
+    console.log(AV.User.current())
+
+    let user = AV.User.current()
+    if (user) {
+        welcome.textContent = '你好' + user.attributes.username
+        logout.removeAttribute('hidden')
+    }
+
+    logout.onclick = function () {
+        AV.User.logOut()
+        window.location.reload()
+    }
+
+    let signinForm = document.querySelector('form[name=signIn]')
+    signinForm.addEventListener('submit', (e) => {
+        e.preventDefault()
+
+        // 新建 AVUser 对象实例
+        var user = new AV.User();
+        // 设置用户名
+        user.setUsername(signinForm.username.value);
+        // 设置密码
+        user.setPassword(signinForm.password.value);
+        // 设置邮箱
+        user.setEmail(signinForm.email.value);
+        console.log('test')
+        user.signUp().then(function (loginedUser) {
+            console.log(loginedUser)
+            window.location.reload
+        }, function (error) {
+            console.log('error')
+            console.log(error)
+            signInError.textContent = error
+        });
+    })
+
+    let loginForm = document.querySelector('form[name=login]')
+    loginForm.onsubmit = (e) => {
+        e.preventDefault()
+        let password = loginForm.password.value
+        console.log(password)
+        let username = loginForm.username.value
+        console.log(username)
+
+        AV.User.logIn(username, password).then(function (loginedUser) {
+            console.log(loginedUser)
+            window.location.reload()
+        }, function (error) {
+            console.log(error)
+        })
+    }
+
+</script>
+</html>
